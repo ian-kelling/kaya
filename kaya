@@ -23,6 +23,7 @@ shopt -s inherit_errexit 2>/dev/null ||: # ignore fail in bash < 4.4
 set -eE -o pipefail
 trap 'echo "kaya: backup failed" >&2' ERR
 
+shopt -s dotglob nullglob
 
 kaya_protocol_version=2
 
@@ -196,6 +197,11 @@ main() {
 
     if [[ ! -d $backup_dir ]]; then
         create-backup-dir
+    else
+        backup_dir_files=( $backup_dir/* )
+        if (( ${#backup_dir_files[@]} == 0 )); then
+            create-backup-dir
+        fi
     fi
 
     if [[ ! -e $password_file ]]; then
